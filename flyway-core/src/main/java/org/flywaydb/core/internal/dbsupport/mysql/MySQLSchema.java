@@ -50,10 +50,10 @@ public class MySQLSchema extends Schema<MySQLDbSupport> {
                         + "(Select count(*) from information_schema.TABLES Where TABLE_SCHEMA=?) + "
                         + "(Select count(*) from information_schema.VIEWS Where TABLE_SCHEMA=?) + "
                         + "(Select count(*) from information_schema.TABLE_CONSTRAINTS Where TABLE_SCHEMA=?) + "
-                        + "(Select count(*) from information_schema.EVENTS Where EVENT_SCHEMA=?) + "
+                        // disabled for MySQL 5.0.77: + "(Select count(*) from information_schema.EVENTS Where EVENT_SCHEMA=?) + "
                         + "(Select count(*) from information_schema.TRIGGERS Where TRIGGER_SCHEMA=?) + "
                         + "(Select count(*) from information_schema.ROUTINES Where ROUTINE_SCHEMA=?)",
-                name, name, name, name, name, name
+                name, name, name, name, name // disabled for MySQL 5.0.77:, name
         );
         return objectCount == 0;
     }
@@ -96,15 +96,19 @@ public class MySQLSchema extends Schema<MySQLDbSupport> {
      * @throws SQLException when the clean statements could not be generated.
      */
     private List<String> cleanEvents() throws SQLException {
+		/* disabled for MySQL 5.0.77:
         List<Map<String, String>> eventNames =
                 jdbcTemplate.queryForList(
                         "SELECT event_name FROM information_schema.EVENTS WHERE EVENT_SCHEMA=?",
                         name);
 
+		*/
         List<String> statements = new ArrayList<String>();
+		/* disabled for MySQL 5.0.77:
         for (Map<String, String> row : eventNames) {
             statements.add("DROP EVENT " + dbSupport.quote(name, row.get("event_name")));
         }
+		*/
         return statements;
     }
 
